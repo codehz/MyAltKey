@@ -103,12 +103,15 @@ HKL next(HKL current)
 
 void handleIME()
 {
-  HWND win = GetForegroundWindow();
-  if (!win)
-    return;
-  DWORD tid = GetWindowThreadProcessId(win, nullptr);
-  if (!tid)
-    return;
-  HKL layout = GetKeyboardLayout(tid);
-  PostMessage(win, WM_INPUTLANGCHANGEREQUEST, WPARAM(next(layout)), 0);
+  INPUT ip_win = {}, ip_space = {};
+  ip_win.type = INPUT_KEYBOARD;
+  ip_space.type = INPUT_KEYBOARD;
+  ip_win.ki.wVk = VK_LWIN;
+  ip_space.ki.wVk = VK_SPACE;
+  SendInput(1, &ip_win, sizeof ip_win);
+  SendInput(1, &ip_space, sizeof ip_space);
+  ip_win.ki.dwFlags = KEYEVENTF_KEYUP;
+  ip_space.ki.dwFlags = KEYEVENTF_KEYUP;
+  SendInput(1, &ip_space, sizeof ip_space);
+  SendInput(1, &ip_win, sizeof ip_win);
 }
